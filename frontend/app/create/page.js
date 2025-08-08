@@ -1,65 +1,91 @@
 "use client";
 import { useState } from "react";
-import { getMarketplaceContract } from "../../lib/contract";
-import { ethers } from "ethers";
+import { uploadToPinata } from "../../lib/ipfs";
 
 export default function Create() {
-  const [form, setForm] = useState({ name: "", description: "", image: "", price: "" });
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    imageFile: null,
+  });
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [ipfsUrl, setIpfsUrl] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (!form.imageFile) {
+      alert("Please upload an image.");
+      return;
+    }
 
-    // Upload metadata to IPFS (mocked here)
-    const metadata = {
-      name: form.name,
-      description: form.description,
-      image: form.image,
-    };
-    const uri = "https://ipfs.io/ipfs/your-metadata-hash"; // Replace with actual IPFS upload
-
-    if (window.ethereum) {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-      const contract = getMarketplaceContract(signer);
-
-      const price = ethers.parseEther(form.price);
-      const tx = await contract.createItem(uri, price);
-      await tx.wait();
-      alert("NFT listed!");
+    setLoading(true);
+    try {
+      const tokenURI = await uploadToPinata(form.name, form.description, form.imageFile);
+      setIpfsUrl(tokenURI);
+      alert("Uploaded to IPFS!");
+    } catch (err) {
+      alert("Upload failed. Check console for details.");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   }
 
+  function handleImageChange(e) {
+    const file = e.target.files[0];
+    setForm({ ...form, imageFile: file });
+    setPreviewUrl(URL.createObjectURL(file));
+  }
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Create & List NFT</h1>
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+    <div className="max-w-xl mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-4">Create NFT Metadata</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
           placeholder="Name"
           className="w-full p-2 border rounded"
+          value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
         />
         <textarea
           placeholder="Description"
           className="w-full p-2 border rounded"
+          value={form.description}
           onChange={(e) => setForm({ ...form, description: e.target.value })}
         />
         <input
-          type="text"
-          placeholder="Image URL"
+          type="file"
+          accept="image/*"
           className="w-full p-2 border rounded"
-          onChange={(e) => setForm({ ...form, image: e.target.value })}
+          onChange={handleImageChange}
         />
-        <input
-          type="text"
-          placeholder="Price in ETH"
-          className="w-full p-2 border rounded"
-          onChange={(e) => setForm({ ...form, price: e.target.value })}
-        />
-        <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-          List NFT
+        {previewUrl && (
+          <img src={previewUrl} alt="Preview" className="w-full h-auto rounded shadow" />
+        )}
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          disabled={loading}
+        >
+          {loading ? "Uploading..." : "Upload to IPFS"}
         </button>
       </form>
+
+      {ipfsUrl && (
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold">IPFS Metadata URL:</h2>
+          <a
+            href={ipfsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 break-all"
+          >
+            {ipfsUrl}
+          </a>
+        </div>
+      )}
     </div>
   );
 }
