@@ -1,4 +1,5 @@
 // lib/ipfs.js
+PINATA_JWT=process.env.PINATA_JWT
 export async function uploadToPinata(name, description, imageFile) {
   const formData = new FormData();
   formData.append("file", imageFile);
@@ -6,7 +7,7 @@ export async function uploadToPinata(name, description, imageFile) {
   const imageRes = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${import.meta.env.PINATA_JWT}`, // or use API key/secret via custom headers
+      Authorization: `Bearer ${PINATA_JWT}`, // or use API key/secret via custom headers
     },
     body: formData,
   });
@@ -24,7 +25,7 @@ export async function uploadToPinata(name, description, imageFile) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${import.meta.env.PINATA_JWT}`,
+      Authorization: `Bearer ${PINATA_JWT}`,
     },
     body: JSON.stringify(metadata),
   });

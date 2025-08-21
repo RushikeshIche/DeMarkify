@@ -9,11 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@pinata/sdk": "^2.1.0",
+    "axios": "^1.11.0",
+    "busboy": "^1.6.0",
     "ethers": "^6.15.0",
+    "multer": "^2.0.2",
     "next": "15.4.6",
+    "next-connect": "^1.0.0",
+    "pinata": "^2.4.9",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "react-toastify": "^11.0.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

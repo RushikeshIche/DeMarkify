@@ -15,6 +15,7 @@ contract Marketplace is ReentrancyGuard {
         uint tokenId;
         uint price;
         address payable seller;
+        address buyer;
         bool sold;
     }
 
@@ -58,6 +59,7 @@ contract Marketplace is ReentrancyGuard {
             _tokenId,
             _price,
             payable(msg.sender),
+            address(0),
             false
         );
 
@@ -78,6 +80,8 @@ contract Marketplace is ReentrancyGuard {
         item.seller.transfer(item.price);
         feeAccount.transfer(totalPrice - item.price);
         item.nft.transferFrom(address(this), msg.sender, item.tokenId);
+
+        item.buyer = msg.sender;
         item.sold = true;
 
         emit Bought(
