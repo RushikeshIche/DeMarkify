@@ -1,3 +1,4 @@
+// We are using export addressess to automatically read and write the contract address for easy address access to frontend
 const fs = require("fs");
 const path = require("path");
 

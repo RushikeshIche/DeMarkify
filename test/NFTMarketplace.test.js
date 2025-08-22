@@ -10,9 +10,9 @@ describe("NFT Marketplace", function () {
     const nft = await NFT.deploy();
     await nft.waitForDeployment();
 
-    // Deploy Marketplace with 2% fee
+    // Deploy Marketplace with 1% fee
     const Marketplace = await ethers.getContractFactory("Marketplace");
-    const marketplace = await Marketplace.deploy(2);
+    const marketplace = await Marketplace.deploy(1);
     await marketplace.waitForDeployment();
 
     return { nft, marketplace, deployer, seller, buyer };
@@ -22,7 +22,7 @@ describe("NFT Marketplace", function () {
     it("Should set feeAccount and feePercent correctly", async function () {
       const { marketplace, deployer } = await loadFixture(deployFixture);
       expect(await marketplace.feeAccount()).to.equal(deployer.address);
-      expect(await marketplace.feePercent()).to.equal(2);
+      expect(await marketplace.feePercent()).to.equal(1);
     });
   });
 

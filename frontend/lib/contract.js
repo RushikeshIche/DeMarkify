@@ -1,3 +1,9 @@
+// ----------------------------
+// |
+// | This is a crucial file to get contracts 
+// |
+// ----------------------------
+
 import { ethers } from "ethers";
 import MarketplaceArtifact from "../../artifacts/contracts/Marketplace.sol/Marketplace.json";
 import NFTArtifact from "../../artifacts/contracts/NFT.sol/NFT.json";

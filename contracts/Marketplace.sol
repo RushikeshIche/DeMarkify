@@ -15,6 +15,7 @@ contract Marketplace is ReentrancyGuard {
         uint tokenId;
         uint price;
         address payable seller;
+        address buyer;
         bool sold;
     }
 
@@ -58,6 +59,7 @@ contract Marketplace is ReentrancyGuard {
             _tokenId,
             _price,
             payable(msg.sender),
+            address(0),
             false
         );
 
@@ -78,6 +80,8 @@ contract Marketplace is ReentrancyGuard {
         item.seller.transfer(item.price);
         feeAccount.transfer(totalPrice - item.price);
         item.nft.transferFrom(address(this), msg.sender, item.tokenId);
+
+        item.buyer = msg.sender;
         item.sold = true;
 
         emit Bought(
@@ -86,6 +90,28 @@ contract Marketplace is ReentrancyGuard {
             item.tokenId,
             item.price,
             item.seller,
+            msg.sender
+        );
+    }
+    function resellItem(uint256 _itemId, uint256 _price) public nonReentrant {
+        Item storage item = items[_itemId];
+        require(item.buyer == msg.sender, "Only buyer can resell");
+        require(_price > 0, "Price must be > 0");
+
+        // Transfer NFT back to marketplace
+        item.nft.transferFrom(msg.sender, address(this), item.tokenId);
+
+        // Reset item details for resale
+        item.seller = payable(msg.sender);
+        item.buyer = address(0);
+        item.price = _price;
+        item.sold = false;
+
+        emit Offered(
+            _itemId,
+            address(item.nft),
+            item.tokenId,
+            _price,
             msg.sender
         );
     }
