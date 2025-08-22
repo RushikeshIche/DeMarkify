@@ -59,14 +59,14 @@ export default function Home() {
     });
     await tx.wait();
 
-    toast.success("✅ Purchase successful!");
     setItems((prev) => prev.filter((item) => item.id !== id));
+    toast.success("✅ Purchase successful!");
   } catch (err) {
     if (err.code === 4001) {
       toast.info("❌ Transaction rejected in MetaMask.");
     } else {
-      console.error("Purchase failed:", err);
-      toast.error("⚠️ Transaction failed. Check console.");
+      // console.error("Purchase failed:", err);
+      toast.error("⚠️ Transaction failed.");
     }
   } finally {
     setBuyingId(null);

@@ -1,3 +1,4 @@
+// Teting Next API
 export default function handler(req, res) {
   console.log("API /test route hit");
   res.status(200).json({ message: "Hello from API" });

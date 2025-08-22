@@ -93,6 +93,28 @@ contract Marketplace is ReentrancyGuard {
             msg.sender
         );
     }
+    function resellItem(uint256 _itemId, uint256 _price) public nonReentrant {
+        Item storage item = items[_itemId];
+        require(item.buyer == msg.sender, "Only buyer can resell");
+        require(_price > 0, "Price must be > 0");
+
+        // Transfer NFT back to marketplace
+        item.nft.transferFrom(msg.sender, address(this), item.tokenId);
+
+        // Reset item details for resale
+        item.seller = payable(msg.sender);
+        item.buyer = address(0);
+        item.price = _price;
+        item.sold = false;
+
+        emit Offered(
+            _itemId,
+            address(item.nft),
+            item.tokenId,
+            _price,
+            msg.sender
+        );
+    }
 
     function getTotalPrice(uint _itemId) public view returns (uint) {
         Item storage item = items[_itemId];

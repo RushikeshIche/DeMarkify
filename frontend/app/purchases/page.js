@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { getMarketplaceContract, getNFTContract } from "../../lib/contract";
-
+import { toast } from "react-toastify";
 export default function Purchases() {
   const [items, setItems] = useState([]);
 
@@ -58,24 +58,57 @@ export default function Purchases() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {items.length > 0 ? (
           items.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white rounded-xl shadow-md p-4 border hover:shadow-lg transition"
+        <div
+          key={item.id}
+          className="bg-white rounded-xl shadow-md p-4 border hover:shadow-lg transition"
+        >
+          <img
+            src={item.image}
+            alt={item.name}
+            className="w-full h-48 object-cover rounded-lg"
+          />
+          <div className="mt-4">
+            <p className="text-lg font-semibold">{item.name}</p>
+            <p className="text-gray-600 text-sm">{item.description}</p>
+            <p className="text-gray-800 font-bold mt-2">{item.price} ETH</p>
+          </div>
+
+          <div className="mt-4">
+            <input
+              type="number"
+              placeholder="Enter resale price in ETH"
+              className="border rounded p-2 w-full mb-2"
+              onChange={(e) => (item.newPrice = e.target.value)}
+            />
+            <button
+              onClick={async () => {
+                try {
+                  const provider = new ethers.BrowserProvider(window.ethereum);
+                  const signer = await provider.getSigner();
+                  const marketplace = getMarketplaceContract(signer);
+
+                  // This is very important step to approve marketplace to tranfer the ERC721 as it automatically does not allows
+                  const nft = getNFTContract(signer);
+                  await nft.approve(marketplace.target, item.id);
+
+
+                  const priceInWei = ethers.parseEther(item.newPrice);
+                  const tx = await marketplace.resellItem(item.id, priceInWei);
+                  await tx.wait();
+
+                  toast.success("NFT listed for resale!");
+                } catch (err) {
+                  console.error("Resell failed:", err);
+                  toast.error("Failed to resell NFT");
+                }
+              }}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
             >
-              <img
-                src={item.image}
-                alt={item.name}
-                className="w-full h-48 object-cover rounded-lg"
-              />
-              <div className="mt-4">
-                <p className="text-lg font-semibold">{item.name}</p>
-                <p className="text-gray-600 text-sm">{item.description}</p>
-                <p className="text-gray-800 font-bold mt-2">
-                  {item.price} ETH
-                </p>
-              </div>
-            </div>
-          ))
+              Resell NFT
+            </button>
+          </div>
+        </div>  
+        ))
         ) : (
           <p className="text-gray-600">You haven’t purchased any NFTs yet.</p>
         )}

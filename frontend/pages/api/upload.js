@@ -13,6 +13,7 @@ const upload = multer({
 });
 
 function runMiddleware(req, res, fn) {
+  // Middleware promise to check if error is not passed upon the next step
   return new Promise((resolve, reject) => {
     fn(req, res, (result) => {
       if (result instanceof Error) return reject(result);
@@ -32,11 +33,11 @@ export default async function handler(req, res) {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
     }
-
-    // ✅ Convert multer buffer → Blob
+    // Here we are requesting file buffer as it contains the image data
     const fileBlob = new Blob([req.file.buffer], { type: req.file.mimetype });
 
     // Upload to Pinata
+    // Here the function and instance name are important for filetype uploads
     const { cid } = await pinata.upload.public.file(fileBlob, {
       metadata: { name: req.file.originalname },
     });

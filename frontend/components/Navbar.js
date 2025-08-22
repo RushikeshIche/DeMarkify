@@ -12,22 +12,41 @@ export default function Navbar() {
       return;
     }
     try {
+    // Force MetaMask to show the account selection popup
+    // const accounts = await window.ethereum.request({
+    //   method: "wallet_requestPermissions",
+    //   params: [{ eth_accounts: {} }],
+    // }).then(() =>
+    //   window.ethereum.request({ method: "eth_requestAccounts" })
+    // );
+    
+    // //Here not forcing to show but using autoconnect as metamask retrieves the accounts
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const address = await signer.getAddress();
       setAccount(address);
-
-      // Listen for account change
-      window.ethereum.on("accountsChanged", (accounts) => {
-        setAccount(accounts.length > 0 ? accounts[0] : null);
-      });
+      // console.log("Connected:", address);
     } catch (err) {
-      console.error("Wallet connection failed:", err);
+      // console.error("Wallet connection failed:", err);
     }
   }
 
+  function disconnectWallet() {
+    setAccount(null);
+    console.log("Wallet disconnected");
+  }
+
+  // Listen for account changes
   useEffect(() => {
-    connectWallet();
+    if (window.ethereum) {
+      window.ethereum.on("accountsChanged", (accounts) => {
+        if (accounts.length > 0) {
+          setAccount(accounts[0]); // update to the new account
+        } else {
+          setAccount(null); // no accounts => disconnected
+        }
+      });
+    }
   }, []);
 
   return (
@@ -46,14 +65,29 @@ export default function Navbar() {
           My Listings
         </Link>
       </div>
-      <button
-        onClick={connectWallet}
-        className="bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-      >
-        {account
-          ? `Connected: ${account.slice(0, 6)}...${account.slice(-4)}`
-          : "Connect Wallet"}
-      </button>
+
+      <div className="flex gap-3">
+        {!account ? (
+          <button
+            onClick={connectWallet}
+            className="bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+          >
+            Connect Wallet
+          </button>
+        ) : (
+          <>
+            <span className="bg-gray-800 px-3 py-2 rounded-lg">
+              {account.slice(0, 6)}...{account.slice(-4)}
+            </span>
+            <button
+              onClick={disconnectWallet}
+              className="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition"
+            >
+              Disconnect
+            </button>
+          </>
+        )}
+      </div>
     </nav>
   );
 }

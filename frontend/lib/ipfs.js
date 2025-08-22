@@ -1,4 +1,9 @@
-// lib/ipfs.js
+// ----------------------------
+// |
+// | This file was created for direct ipfs upload instead of pinata but the feature was not fully implemented 
+// |
+// ----------------------------
+
 PINATA_JWT=process.env.PINATA_JWT
 export async function uploadToPinata(name, description, imageFile) {
   const formData = new FormData();
