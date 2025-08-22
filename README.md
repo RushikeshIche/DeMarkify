@@ -104,8 +104,7 @@ npm run dev
 
 Make sure to configure your .env with your private key and RPC URL.
 
-🌐 Frontend (Optional)
-This repo focuses on smart contracts. For a frontend:
+🌐 Frontend : [Frontend Docs](https://github.com/RushikeshIche/DeMarkify/blob/main/frontend/README.md) 
 
 Use Ethers.js to interact with contracts
 
