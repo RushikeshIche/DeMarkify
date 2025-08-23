@@ -15,6 +15,9 @@ A full-stack decentralized NFT Marketplace built with Solidity, Hardhat, and Ope
 
 ---
 
+🌐 Frontend : [Frontend Docs](https://github.com/RushikeshIche/DeMarkify/blob/main/frontend/README.md) 
+
+---
 ##  Smart Contracts
 
 ### `NFT.sol`
@@ -103,8 +106,6 @@ npm run dev
 ```
 
 Make sure to configure your .env with your private key and RPC URL.
-
-🌐 Frontend : [Frontend Docs](https://github.com/RushikeshIche/DeMarkify/blob/main/frontend/README.md) 
 
 Use Ethers.js to interact with contracts
 
